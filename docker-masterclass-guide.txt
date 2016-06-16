@@ -1,0 +1,139 @@
+docker run hello-world
+
+docker run -ti busybox
+
+docker run -tid busybox
+
+docker ps 
+
+-----------------------
+
+docker ps
+
+docker inspect <DOCKERID or DOCKERNAME>
+
+docker ps -ql
+
+docker run -tid --name mybusybox busybox
+
+docker stop mybusybox
+
+------------------------
+
+docker start mybusybox
+
+docker  stats mybusybox
+
+docker run -tid --name mybusybox busybox
+
+docker stop mybusybox
+
+docker rm mybusybox
+
+-------------------------
+
+docker run -d --name mynginx nginx
+
+docker ps
+
+curl http://localhost:80
+
+docker rm -f mynginx
+
+docker ps
+
+docker run -d -p 8080:80 --name mynginx nginx
+
+curl http://localhost:8080
+
+---------------------------
+
+docker run --link=mynginx -ti --rm busybox
+
+/ #  wget -q http://mynginx:80 -O -
+
+----------------------------
+
+docker run -ti --rm --name one -v myvol:/myimportantdata busybox
+/ # touch /myimportantdata/persistent-file
+/ # touch /non-persistent-file
+/ # ls -l /myimportantdata/persistent-file /non-persistent-file
+
+
+docker volume ls
+
+docker run -ti --rm --name  two -v myvol:/myimportantdata busybox
+/ # ls -l /myimportantdata/persistent-file
+/ # # persistent-file is there ... as expected... ;)
+/ # ls -l /non-persistent-file
+/ # # non-persistent-file is ephemeral... it isn't on a volume so... it isn't here
+
+docker run -ti --rm --name one -v /tmp:/myimportantdata busybox
+/ # touch /myimportantdata/persistent-file
+/ # touch /non-persistent-file
+
+
+docker run -ti --rm --name  two -v /tmp:/myimportantdata busybox
+/ # ls /myimportantdata/persistent-file
+/ # ls /non-persistent-file
+
+--------------------------------
+
+git clone https://github.com/hopla-training/docker-simplest-nodeapp.git
+
+docker build -t simpleapp:1.0 -f docker-simplest-nodeapp/Dockerfile docker-simplest-nodeapp
+
+docker images|grep simpleapp
+
+docker run -d -p 4000:3000 --name simpleapp simpleapp:1.0
+
+curl http://0.0.0.0:4000
+
+docker rm -f simpleapp
+
+docker login
+
+docker tag simpleapp:1.0 hopla/simpleapp:masterclass
+
+docker images|grep simpleapp
+
+docker push hopla/simpleapp:masterclass
+
+docker pull hopla/simpleapp:masterclass
+
+----------------------------------
+
+
+docker-compose version
+
+wget https://raw.githubusercontent.com/hopla-training/docker-simple-DEMO/master/docker-simple-DEMO.yml
+
+docker-compose -f docker-simple-DEMO.yml up -d
+
+docker-compose -f docker-simple-DEMO.yml ps
+
+curl http://0.0.0.0:8181
+
+docker-compose -f docker-simple-DEMO.yml scale simplest-nodeapp=10
+
+while :; do curl http://0.0.0.0:8181;sleep 2;done
+
+----------------------------------
+
+docker -H tcp://localhost:8501 info
+ 
+docker -H tcp://localhost:8501 ps
+
+docker -H tcp://192.168.1.10:8501 run --name swarm-busybox -tid busybox
+
+docker -H tcp://192.168.1.10:8501 ps
+
+docker-compose -f docker-simple-DEMO.yml -H tcp://192.168.1.10:8501 up -d
+
+docker-compose -f docker-simple-DEMO.yml -H tcp://192.168.1.10:8501 ps
+
+docker-compose -f docker-simple-DEMO.yml -H tcp://192.168.1.10:8501 scale simplest-nodeapp=5
+
+docker-compose -f docker-simple-DEMO.yml -H tcp://192.168.1.10:8501 ps
+
+docker -H tcp://192.168.1.10:8501 ps
